@@ -1,0 +1,7 @@
+specFileName: /Users/ivanmalkov/Desktop/API/swagger.yaml
+apiTitle: AnswersCollector
+splitSpec: false
+codeSamples: false
+swaggerUI: true
+travis: false
+oasVersion: '2.0'

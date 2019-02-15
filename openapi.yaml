@@ -1,0 +1,146 @@
+swagger: '2.0'
+info:
+  description: This is an Answers Collector Server. It can receive and provide answers that students create during bootcamps/workshops.
+  version: v1
+  title: Answers Collector
+host: europe-west1-firestoreanswer.cloudfunctions.net
+basePath: /
+tags:
+  - name: answer
+    description: For adding answers
+  - name: answers
+    description: Getting or updating answers
+schemes:
+  - https
+paths:
+  /answer:
+    post:
+      tags:
+        - answer
+      summary: Add a new answer to the collection
+      description: ''
+      operationId: addPet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Answer object that needs to be added to the DB
+          required: true
+          schema:
+            $ref: '#/definitions/Answer'
+      responses:
+        '200':
+          description: Success response
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                example: xdvwwJduoAfaXnhUXKDx
+        '400':
+          description: 'Invalid input, or some fields are missing'
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: exerciseId is required
+        '405':
+          description: Unsupported method
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Bad request. Only POST method is supported
+  /answers:
+    get:
+      tags:
+        - answers
+      summary: 'get all answers, or specific answer from the DB'
+      description: If fetching for 1 answer by id - will return object. In all other scenarios will return array of object(s). 'userId' & 'exerciseId' queries can be combined to get all answers for specific exercise submitted by specific user.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: query
+          description: 'Get answer by it''s id. Example: /answers?id=fgdfg345dfdfs'
+          required: false
+        - name: userId
+          in: query
+          description: 'Get ALL answers submitted by user. Example: /answers?userId=fgdfg3ghvghv'
+          required: false
+        - name: exerciseId
+          in: query
+          description: 'Get ALL answers submitted for exercise. Example: /answers?exerciseId=fgdfsfg3gghv'
+          required: false
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/DBAnswer'
+        '404':
+          description: Document not found
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unable to find the document
+        '405':
+          description: Unsupported method
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Bad request. Only GET/PATCH are supported
+        '500':
+          description: Server error
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Error getting requested document(s)
+              err:
+                type: object
+                example: {}
+definitions:
+  Answer:
+    type: object
+    required:
+      - answer
+      - userId
+      - exerciseId
+    properties:
+      answer:
+        type: string
+      userId:
+        type: string
+      exerciseId:
+        type: string
+  DBAnswer:
+    type: object
+    properties:
+      answer:
+        type: string
+      normalizedAnswer:
+        type: string
+      userId:
+        type: string
+      exerciseId:
+        type: string
+      id:
+        type: string
+      created:
+        type: integer
+      hash:
+        type: string
